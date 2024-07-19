@@ -19,7 +19,6 @@ CC=@CC@
 SHLD=@SHLD@
 CFLAGS=@CFLAGS@
 
-# CFLAGS += -flto -Wno-stringop-overread
 CFLAGS += -DWITHOUT_LOG
 # CFLAGS += -DADVANCED_ACCOUNT
 
