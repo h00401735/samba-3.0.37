@@ -1,0 +1,10 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: tdb
+Description: A trivial database
+Version: 4.0
+#Libs:  -L${libdir} -ltdb
+Cflags: -I${includedir} -g -O2
