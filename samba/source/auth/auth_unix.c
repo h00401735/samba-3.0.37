@@ -1,18 +1,18 @@
-/* 
+/*
    Unix SMB/CIFS implementation.
    Password and authentication handling
    Copyright (C) Andrew Bartlett              2001
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -25,18 +25,18 @@
 
 /**
  * update the encrypted smbpasswd file from the plaintext username and password
- *  
+ *
  *  this ugly hack needs to die, but not quite yet, I think people still use it...
  **/
 static BOOL update_smbpassword_file(const char *user, const char *password)
 {
-	struct samu 	*sampass;
-	BOOL            ret;
-	
+	struct samu *sampass;
+	BOOL ret;
+
 	if ( !(sampass = samu_new( NULL )) ) {
 		return False;
 	}
-	
+
 	become_root();
 	ret = pdb_getsampwnam(sampass, user);
 	unbecome_root();
@@ -84,9 +84,9 @@ static BOOL update_smbpassword_file(const char *user, const char *password)
  **/
 
 static NTSTATUS check_unix_security(const struct auth_context *auth_context,
-			     void *my_private_data, 
+			     void *my_private_data,
 			     TALLOC_CTX *mem_ctx,
-			     const auth_usersupplied_info *user_info, 
+			     const auth_usersupplied_info *user_info,
 			     auth_serversupplied_info **server_info)
 {
 	NTSTATUS nt_status;
@@ -95,17 +95,17 @@ static NTSTATUS check_unix_security(const struct auth_context *auth_context,
 	become_root();
 	pass = Get_Pwnam(user_info->internal_username);
 
-	
-	/** @todo This call assumes a ASCII password, no charset transformation is 
+
+	/** @todo This call assumes a ASCII password, no charset transformation is
 	    done.  We may need to revisit this **/
 	nt_status = pass_check(pass,
-				pass ? pass->pw_name : user_info->internal_username, 
+				pass ? pass->pw_name : user_info->internal_username,
 				(char *)user_info->plaintext_password.data,
 				user_info->plaintext_password.length-1,
-				lp_update_encrypted() ? 
+				lp_update_encrypted() ?
 				update_smbpassword_file : NULL,
 				True);
-	
+
 	unbecome_root();
 
 	if (NT_STATUS_IS_OK(nt_status)) {
@@ -113,7 +113,7 @@ static NTSTATUS check_unix_security(const struct auth_context *auth_context,
 			/* if a real user check pam account restrictions */
 			/* only really perfomed if "obey pam restriction" is true */
 			nt_status = smb_pam_accountcheck(pass->pw_name);
-			if (  !NT_STATUS_IS_OK(nt_status)) {
+			if (!NT_STATUS_IS_OK(nt_status)) {
 				DEBUG(1, ("PAM account restriction prevents user login\n"));
 			} else {
 				make_server_info_pw(server_info, pass->pw_name, pass);
@@ -128,7 +128,7 @@ static NTSTATUS check_unix_security(const struct auth_context *auth_context,
 }
 
 /* module initialisation */
-static NTSTATUS auth_init_unix(struct auth_context *auth_context, const char* param, auth_methods **auth_method) 
+static NTSTATUS auth_init_unix(struct auth_context *auth_context, const char* param, auth_methods **auth_method)
 {
 	if (!make_auth_methods(auth_context, auth_method)) {
 		return NT_STATUS_NO_MEMORY;

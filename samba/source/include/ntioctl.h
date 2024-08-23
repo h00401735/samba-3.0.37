@@ -1,18 +1,18 @@
-/* 
+/*
    Unix SMB/CIFS implementation.
    NT ioctl code constants
    Copyright (C) Andrew Tridgell              2002
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -40,14 +40,14 @@
 #define FSCTL_GET_COMPRESSION        0x0009003C
 #define FSCTL_SET_COMPRESSION        0x0009C040
 #define FSCTL_REQUEST_FILTER_OPLOCK  0x0009008C
-#define FSCTL_FIND_FILES_BY_SID	     0x0009008F
+#define FSCTL_FIND_FILES_BY_SID      0x0009008F
 #define FSCTL_FILESYS_GET_STATISTICS 0x00090090
 #define FSCTL_SET_OBJECT_ID          0x00090098
 #define FSCTL_GET_OBJECT_ID          0x0009009C
 #define FSCTL_SET_REPARSE_POINT      0x000900A4
 #define FSCTL_GET_REPARSE_POINT      0x000900A8
 #define FSCTL_DELETE_REPARSE_POINT   0x000900AC
-#define FSCTL_0x000900C0	     0x000900C0
+#define FSCTL_0x000900C0             0x000900C0
 #define FSCTL_SET_SPARSE             0x000900C4
 #define FSCTL_SET_ZERO_DATA          0x000900C8
 #define FSCTL_SET_ENCRYPTION         0x000900D7

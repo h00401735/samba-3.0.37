@@ -83,7 +83,7 @@ pstring debugf = "";
 
 BOOL    AllowDebugChange = True;
 
-#ifndef SMALL_BUILD
+#ifndef WITHOUT_LOG
 BOOL    debug_warn_unknown_class = True;
 BOOL    debug_auto_add_unknown_class = True;
 

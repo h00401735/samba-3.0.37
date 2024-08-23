@@ -69,8 +69,10 @@ extern pstring debugf;
  * still be through a macro still called DEBUGLEVEL. This cannot be done now
  * because some references would expand incorrectly.
  */
+#ifndef WITHOUT_LOG
 #define DEBUGLEVEL *debug_level
 extern int DEBUGLEVEL;
+#endif
 
 /*
  * Define all new debug classes here. A class is represented by an entry in

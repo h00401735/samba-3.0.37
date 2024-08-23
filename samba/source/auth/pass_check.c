@@ -1,18 +1,18 @@
-/* 
+/*
    Unix SMB/CIFS implementation.
    Password checking
    Copyright (C) Andrew Tridgell 1992-1998
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -28,7 +28,7 @@
 
 /* these are kept here to keep the string_combinations function simple */
 static fstring this_user;
-#if !defined(WITH_PAM) 
+#if !defined(WITH_PAM)
 static fstring this_salt;
 static fstring this_crypted;
 #endif
@@ -59,8 +59,7 @@ static BOOL afs_auth(char *user, char *password)
 	{
 		return (True);
 	}
-	DEBUG(1,
-	      ("AFS authentication for \"%s\" failed (%s)\n", user, reason));
+	DEBUG(1, ("AFS authentication for \"%s\" failed (%s)\n", user, reason));
 	return (False);
 }
 #endif
@@ -110,7 +109,7 @@ static BOOL dfs_auth(char *user, char *password)
 #ifdef HAVE_CRYPT
 	/*
 	 * We only go for a DCE login context if the given password
-	 * matches that stored in the local password file.. 
+	 * matches that stored in the local password file..
 	 * Assumes local passwd file is kept in sync w/ DCE RGY!
 	 */
 
@@ -353,7 +352,7 @@ static BOOL dfs_auth(char *user, char *password)
 	dcelogin_atmost_once = 1;
 	return (True);
 
-      err:
+	err:
 
 	/* Go back to root, JRA. */
 	set_effective_uid(0);
@@ -509,12 +508,10 @@ static NTSTATUS password_check(const char *password)
 #endif /* WITH_DFS */
 
 #ifdef OSF1_ENH_SEC
-	
-	ret = (strcmp(osf1_bigcrypt(password, this_salt),
-		      this_crypted) == 0);
+
+	ret = (strcmp(osf1_bigcrypt(password, this_salt), this_crypted) == 0);
 	if (!ret) {
-		DEBUG(2,
-		      ("OSF1_ENH_SEC failed. Trying normal crypt.\n"));
+		DEBUG(2, ("OSF1_ENH_SEC failed. Trying normal crypt.\n"));
 		ret = (strcmp((char *)crypt(password, this_salt), this_crypted) == 0);
 	}
 	if (ret) {
@@ -522,30 +519,30 @@ static NTSTATUS password_check(const char *password)
 	} else {
 		return NT_STATUS_WRONG_PASSWORD;
 	}
-	
+
 #endif /* OSF1_ENH_SEC */
-	
+
 #ifdef ULTRIX_AUTH
 	ret = (strcmp((char *)crypt16(password, this_salt), this_crypted) == 0);
 	if (ret) {
 		return NT_STATUS_OK;
-        } else {
+	} else {
 		return NT_STATUS_WRONG_PASSWORD;
 	}
-	
+
 #endif /* ULTRIX_AUTH */
-	
+
 #ifdef LINUX_BIGCRYPT
 	ret = (linux_bigcrypt(password, this_salt, this_crypted));
-        if (ret) {
+	if (ret) {
 		return NT_STATUS_OK;
 	} else {
 		return NT_STATUS_WRONG_PASSWORD;
 	}
 #endif /* LINUX_BIGCRYPT */
-	
+
 #if defined(HAVE_BIGCRYPT) && defined(HAVE_CRYPT) && defined(USE_BOTH_CRYPT_CALLS)
-	
+
 	/*
 	 * Some systems have bigcrypt in the C library but might not
 	 * actually use it for the password hashes (HPUX 10.20) is
@@ -563,26 +560,22 @@ static NTSTATUS password_check(const char *password)
 		return NT_STATUS_WRONG_PASSWORD;
 	}
 #else /* HAVE_BIGCRYPT && HAVE_CRYPT && USE_BOTH_CRYPT_CALLS */
-	
+
 #ifdef HAVE_BIGCRYPT
 	ret = (strcmp(bigcrypt(password, this_salt), this_crypted) == 0);
-        if (ret) {
+	if (ret) {
 		return NT_STATUS_OK;
 	} else {
 		return NT_STATUS_WRONG_PASSWORD;
 	}
 #endif /* HAVE_BIGCRYPT */
-	
+
 #ifndef HAVE_CRYPT
 	DEBUG(1, ("Warning - no crypt available\n"));
 	return NT_STATUS_LOGON_FAILURE;
 #else /* HAVE_CRYPT */
 	ret = (strcmp((char *)crypt(password, this_salt), this_crypted) == 0);
-        if (ret) {
-		return NT_STATUS_OK;
-	} else {
-		return NT_STATUS_WRONG_PASSWORD;
-	}
+	return ret ? NT_STATUS_OK : NT_STATUS_WRONG_PASSWORD;
 #endif /* HAVE_CRYPT */
 #endif /* HAVE_BIGCRYPT && HAVE_CRYPT && USE_BOTH_CRYPT_CALLS */
 #endif /* WITH_PAM */
@@ -593,11 +586,11 @@ static NTSTATUS password_check(const char *password)
 /****************************************************************************
 CHECK if a username/password is OK
 the function pointer fn() points to a function to call when a successful
-match is found and is used to update the encrypted password file 
+match is found and is used to update the encrypted password file
 return NT_STATUS_OK on correct match, appropriate error otherwise
 ****************************************************************************/
 
-NTSTATUS pass_check(const struct passwd *pass, const char *user, const char *password, 
+NTSTATUS pass_check(const struct passwd *pass, const char *user, const char *password,
 		    int pwlen, BOOL (*fn) (const char *, const char *), BOOL run_cracker)
 {
 	pstring pass2;
@@ -615,10 +608,10 @@ NTSTATUS pass_check(const struct passwd *pass, const char *user, const char *pas
 	if (((!*password) || (!pwlen)) && !lp_null_passwords())
 		return NT_STATUS_LOGON_FAILURE;
 
-#if defined(WITH_PAM) 
+#if defined(WITH_PAM)
 
 	/*
-	 * If we're using PAM we want to short-circuit all the 
+	 * If we're using PAM we want to short-circuit all the
 	 * checks below and dive straight into the PAM code.
 	 */
 
@@ -689,16 +682,13 @@ NTSTATUS pass_check(const struct passwd *pass, const char *user, const char *pas
 #ifdef OSF1_ENH_SEC
 	{
 		struct pr_passwd *mypasswd;
-		DEBUG(5, ("Checking password for user %s in OSF1_ENH_SEC\n",
-			  user));
+		DEBUG(5, ("Checking password for user %s in OSF1_ENH_SEC\n", user));
 		mypasswd = getprpwnam(user);
 		if (mypasswd) {
 			fstrcpy(this_user, mypasswd->ufld.fd_name);
 			fstrcpy(this_crypted, mypasswd->ufld.fd_encrypt);
 		} else {
-			DEBUG(5,
-			      ("OSF1_ENH_SEC: No entry for user %s in protected database !\n",
-			       user));
+			DEBUG(5, ("OSF1_ENH_SEC: No entry for user %s in protected database !\n", user));
 		}
 	}
 #endif
@@ -721,14 +711,11 @@ NTSTATUS pass_check(const struct passwd *pass, const char *user, const char *pas
 
 	if (!*this_crypted) {
 		if (!lp_null_passwords()) {
-			DEBUG(2, ("Disallowing %s with null password\n",
-				  this_user));
+			DEBUG(2, ("Disallowing %s with null password\n", this_user));
 			return NT_STATUS_LOGON_FAILURE;
 		}
 		if (!*password) {
-			DEBUG(3,
-			      ("Allowing access to %s with null password\n",
-			       this_user));
+			DEBUG(3, ("Allowing access to %s with null password\n", this_user));
 			return NT_STATUS_OK;
 		}
 	}
@@ -737,15 +724,15 @@ NTSTATUS pass_check(const struct passwd *pass, const char *user, const char *pas
 
 	/* try it as it came to us */
 	nt_status = password_check(password);
-        if NT_STATUS_IS_OK(nt_status) {
-                if (fn) {
-                        fn(user, password);
+	if NT_STATUS_IS_OK(nt_status) {
+		if (fn) {
+			fn(user, password);
 		}
 		return (nt_status);
 	} else if (!NT_STATUS_EQUAL(nt_status, NT_STATUS_WRONG_PASSWORD)) {
-                /* No point continuing if its not the password thats to blame (ie PAM disabled). */
-                return (nt_status);
-        }
+		/* No point continuing if its not the password thats to blame (ie PAM disabled). */
+		return (nt_status);
+	}
 
 	if (!run_cracker) {
 		return (nt_status);
@@ -765,7 +752,7 @@ NTSTATUS pass_check(const struct passwd *pass, const char *user, const char *pas
 	if (strhasupper(pass2)) {
 		strlower_m(pass2);
 		if NT_STATUS_IS_OK(nt_status = password_check(pass2)) {
-		        if (fn)
+			if (fn)
 				fn(user, pass2);
 			return (nt_status);
 		}
@@ -778,12 +765,12 @@ NTSTATUS pass_check(const struct passwd *pass, const char *user, const char *pas
 
 	/* last chance - all combinations of up to level chars upper! */
 	strlower_m(pass2);
- 
-        if (NT_STATUS_IS_OK(nt_status = string_combinations(pass2, password_check, level))) {
-                if (fn)
+
+	if (NT_STATUS_IS_OK(nt_status = string_combinations(pass2, password_check, level))) {
+		if (fn)
 			fn(user, pass2);
 		return nt_status;
 	}
-        
+
 	return NT_STATUS_WRONG_PASSWORD;
 }

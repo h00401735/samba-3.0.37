@@ -125,11 +125,9 @@ static const uint8 *get_ntlm_challenge(struct auth_context *auth_context)
 		uchar chal[8];
 
 		generate_random_buffer(chal, sizeof(chal));
-		auth_context->challenge = data_blob_talloc(auth_context->mem_ctx,
-							   chal, sizeof(chal));
-
-		challenge_set_by = "random";
+		auth_context->challenge = data_blob_talloc(auth_context->mem_ctx, chal, sizeof(chal));
 		auth_context->challenge_may_be_modified = True;
+		challenge_set_by = "random";
 	}
 
 	DEBUG(5, ("auth_context challenge created by %s\n", challenge_set_by));
@@ -530,5 +528,4 @@ NTSTATUS make_auth_context_fixed(struct auth_context **auth_context, uchar chal[
 	(*auth_context)->challenge_set_by = "fixed";
 	return nt_status;
 }
-
 

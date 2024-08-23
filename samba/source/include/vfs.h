@@ -1,21 +1,21 @@
-/* 
+/*
    Unix SMB/CIFS implementation.
    VFS structures and parameters
    Copyright (C) Jeremy Allison                         1999-2005
    Copyright (C) Tim Potter				1999
    Copyright (C) Alexander Bokovoy			2002-2005
    Copyright (C) Stefan (metze) Metzmacher		2003
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -56,16 +56,16 @@
 /* Changed to version 9 to include the get_shadow_data call. --metze */
 /* Changed to version 10 to include pread/pwrite calls. */
 /* Changed to version 11 to include seekdir/telldir/rewinddir calls. JRA */
-/* Changed to version 12 to add mask and attributes to opendir(). JRA 
+/* Changed to version 12 to add mask and attributes to opendir(). JRA
    Also include aio calls. JRA. */
 /* Changed to version 13 as the internal structure of files_struct has changed. JRA */
 /* Changed to version 14 as we had to change DIR to SMB_STRUCT_DIR. JRA */
 /* Changed to version 15 as we added the statvfs call. JRA */
 /* Changed to version 16 as we added the getlock call. JRA */
 /* Changed to version 17 as we removed redundant connection_struct parameters. --jpeach */
-/* Changed to version 18 to add fsp parameter to the open call -- jpeach 
+/* Changed to version 18 to add fsp parameter to the open call -- jpeach
    Also include kernel_flock call - jmcd */
-/* Changed to version 19, kernel change notify has been merged 
+/* Changed to version 19, kernel change notify has been merged
    Also included linux setlease call - jmcd */
 /* Changed to version 20, use ntimes call instead of utime (greater
  * timestamp resolition. JRA. */
@@ -96,14 +96,14 @@ struct vfs_statvfs_struct;
 
 /*
     Available VFS operations. These values must be in sync with vfs_ops struct
-    (struct vfs_fn_pointers and struct vfs_handle_pointers inside of struct vfs_ops). 
+    (struct vfs_fn_pointers and struct vfs_handle_pointers inside of struct vfs_ops).
     In particular, if new operations are added to vfs_ops, appropriate constants
     should be added to vfs_op_type so that order of them kept same as in vfs_ops.
 */
 
 typedef enum _vfs_op_type {
 	SMB_VFS_OP_NOOP = -1,
-	
+
 	/* Disk operations */
 
 	SMB_VFS_OP_CONNECT = 0,
@@ -195,7 +195,7 @@ typedef enum _vfs_op_type {
 	SMB_VFS_OP_SYS_ACL_FREE_TEXT,
 	SMB_VFS_OP_SYS_ACL_FREE_ACL,
 	SMB_VFS_OP_SYS_ACL_FREE_QUALIFIER,
-	
+
 	/* EA operations. */
 	SMB_VFS_OP_GETXATTR,
 	SMB_VFS_OP_LGETXATTR,
@@ -220,7 +220,7 @@ typedef enum _vfs_op_type {
 	SMB_VFS_OP_AIO_SUSPEND,
 
 	/* This should always be last enum value */
-	
+
 	SMB_VFS_OP_LAST
 } vfs_op_type;
 
@@ -230,7 +230,7 @@ typedef enum _vfs_op_type {
 struct vfs_ops {
 	struct vfs_fn_pointers {
 		/* Disk operations */
-		
+
 		int (*connect_fn)(struct vfs_handle_struct *handle, const char *service, const char *user);
 		void (*disconnect)(struct vfs_handle_struct *handle);
 		SMB_BIG_UINT (*disk_free)(struct vfs_handle_struct *handle, const char *path, BOOL small_query, SMB_BIG_UINT *bsize,
@@ -239,9 +239,9 @@ struct vfs_ops {
 		int (*set_quota)(struct vfs_handle_struct *handle, enum SMB_QUOTA_TYPE qtype, unid_t id, SMB_DISK_QUOTA *qt);
 		int (*get_shadow_copy_data)(struct vfs_handle_struct *handle, struct files_struct *fsp, SHADOW_COPY_DATA *shadow_copy_data, BOOL labels);
 		int (*statvfs)(struct vfs_handle_struct *handle, const char *path, struct vfs_statvfs_struct *statbuf);
-		
+
 		/* Directory operations */
-		
+
 		SMB_STRUCT_DIR *(*opendir)(struct vfs_handle_struct *handle, const char *fname, const char *mask, uint32 attributes);
 		SMB_STRUCT_DIRENT *(*readdir)(struct vfs_handle_struct *handle, SMB_STRUCT_DIR *dirp);
 		void (*seekdir)(struct vfs_handle_struct *handle, SMB_STRUCT_DIR *dirp, long offset);
@@ -250,9 +250,9 @@ struct vfs_ops {
 		int (*mkdir)(struct vfs_handle_struct *handle, const char *path, mode_t mode);
 		int (*rmdir)(struct vfs_handle_struct *handle, const char *path);
 		int (*closedir)(struct vfs_handle_struct *handle, SMB_STRUCT_DIR *dir);
-		
+
 		/* File operations */
-		
+
 		int (*open)(struct vfs_handle_struct *handle, const char *fname, files_struct *fsp, int flags, mode_t mode);
 		int (*close_fn)(struct vfs_handle_struct *handle, struct files_struct *fsp, int fd);
 		ssize_t (*read)(struct vfs_handle_struct *handle, struct files_struct *fsp, int fd, void *data, size_t n);
@@ -287,24 +287,24 @@ struct vfs_ops {
 		NTSTATUS (*notify_watch)(struct vfs_handle_struct *handle,
 					 struct sys_notify_context *ctx,
 					 struct notify_entry *e,
-					 void (*callback)(struct sys_notify_context *ctx, 
+					 void (*callback)(struct sys_notify_context *ctx,
 							  void *private_data,
 							  struct notify_event *ev),
 					 void *private_data, void *handle_p);
 		int (*chflags)(struct vfs_handle_struct *handle, const char *path, uint flags);
-		
+
 		/* NT ACL operations. */
-		
+
 		size_t (*fget_nt_acl)(struct vfs_handle_struct *handle, struct files_struct *fsp, int fd,  uint32 security_info, struct security_descriptor_info **ppdesc);
 		size_t (*get_nt_acl)(struct vfs_handle_struct *handle, struct files_struct *fsp, const char *name,  uint32 security_info, struct security_descriptor_info **ppdesc);
 		BOOL (*fset_nt_acl)(struct vfs_handle_struct *handle, struct files_struct *fsp, int fd, uint32 security_info_sent, struct security_descriptor_info *psd);
 		BOOL (*set_nt_acl)(struct vfs_handle_struct *handle, struct files_struct *fsp, const char *name, uint32 security_info_sent, struct security_descriptor_info *psd);
-		
+
 		/* POSIX ACL operations. */
-		
+
 		int (*chmod_acl)(struct vfs_handle_struct *handle, const char *name, mode_t mode);
 		int (*fchmod_acl)(struct vfs_handle_struct *handle, struct files_struct *fsp, int fd, mode_t mode);
-		
+
 		int (*sys_acl_get_entry)(struct vfs_handle_struct *handle, SMB_ACL_T theacl, int entry_id, SMB_ACL_ENTRY_T *entry_p);
 		int (*sys_acl_get_tag_type)(struct vfs_handle_struct *handle, SMB_ACL_ENTRY_T entry_d, SMB_ACL_TAG_T *tag_type_p);
 		int (*sys_acl_get_permset)(struct vfs_handle_struct *handle, SMB_ACL_ENTRY_T entry_d, SMB_ACL_PERMSET_T *permset_p);
@@ -473,22 +473,22 @@ struct vfs_ops {
 
 /*
     Possible VFS operation layers (per-operation)
-    
+
     These values are used by VFS subsystem when building vfs_ops for connection
     from multiple VFS modules. Internally, Samba differentiates only opaque and
     transparent layers at this process. Other types are used for providing better
     diagnosing facilities.
-    
+
     Most modules will provide transparent layers. Opaque layer is for modules
     which implement actual file system calls (like DB-based VFS). For example,
     default POSIX VFS which is built in into Samba is an opaque VFS module.
-    
-    Other layer types (audit, splitter, scanner) were designed to provide different 
+
+    Other layer types (audit, splitter, scanner) were designed to provide different
     degree of transparency and for diagnosing VFS module behaviour.
-    
+
     Each module can implement several layers at the same time provided that only
     one layer is used per each operation.
-    
+
 */
 
 typedef enum _vfs_op_layer {
@@ -507,7 +507,7 @@ typedef enum _vfs_op_layer {
 
 /*
     VFS operation description. Each VFS module registers an array of vfs_op_tuple to VFS subsystem,
-    which describes all operations this module is willing to intercept. 
+    which describes all operations this module is willing to intercept.
     VFS subsystem initializes then the conn->vfs_ops and conn->vfs_opaque_ops structs
     using this information.
 */
@@ -532,12 +532,12 @@ typedef struct vfs_handle_struct {
 typedef struct vfs_statvfs_struct {
 	/* For undefined recommended transfer size return -1 in that field */
 	uint32 OptimalTransferSize;  /* bsize on some os, iosize on other os */
-	uint32 BlockSize; 
+	uint32 BlockSize;
 
 	/*
 	 The next three fields are in terms of the block size.
 	 (above). If block size is unknown, 4096 would be a
-	 reasonable block size for a server to report. 
+	 reasonable block size for a server to report.
 	 Note that returning the blocks/blocksavail removes need
 	 to make a second call (to QFSInfo level 0x103 to get this info.
 	 UserBlockAvail is typically less than or equal to BlocksAvail,

@@ -1,18 +1,18 @@
-/* 
+/*
    Unix SMB/CIFS implementation.
 
    Copyright (C) Andrew Tridgell 2006
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -78,7 +78,7 @@ struct inotify_watch_context {
 	struct inotify_watch_context *next, *prev;
 	struct inotify_private *in;
 	int wd;
-	void (*callback)(struct sys_notify_context *ctx, 
+	void (*callback)(struct sys_notify_context *ctx,
 			 void *private_data,
 			 struct notify_event *ev);
 	void *private_data;
@@ -128,7 +128,7 @@ static BOOL filter_match(struct inotify_watch_context *w,
 				  FILE_NOTIFY_CHANGE_SECURITY))) {
 			return True;
 		}
-		if ((e->mask & IN_MODIFY) && 
+		if ((e->mask & IN_MODIFY) &&
 		    (w->filter & FILE_NOTIFY_CHANGE_ATTRIBUTES)) {
 			return True;
 		}
@@ -139,16 +139,16 @@ static BOOL filter_match(struct inotify_watch_context *w,
 
 	return True;
 }
-	
+
 
 
 /*
   dispatch one inotify event
-  
+
   the cookies are used to correctly handle renames
 */
-static void inotify_dispatch(struct inotify_private *in, 
-			     struct inotify_event *e, 
+static void inotify_dispatch(struct inotify_private *in,
+			     struct inotify_event *e,
 			     uint32_t prev_cookie,
 			     struct inotify_event *e2)
 {
@@ -187,8 +187,7 @@ static void inotify_dispatch(struct inotify_private *in,
 	}
 	ne.path = e->name;
 
-	DEBUG(10, ("inotify_dispatch: ne.action = %d, ne.path = %s\n",
-		   ne.action, ne.path));
+	DEBUG(10, ("inotify_dispatch: ne.action = %d, ne.path = %s\n", ne.action, ne.path));
 
 	/* find any watches that have this watch descriptor */
 	for (w=in->watches;w;w=next) {
@@ -201,14 +200,13 @@ static void inotify_dispatch(struct inotify_private *in,
 	/* SMB expects a file rename to generate three events, two for
 	   the rename and the other for a modify of the
 	   destination. Strange! */
-	if (ne.action != NOTIFY_ACTION_NEW_NAME ||
-	    (e->mask & IN_ISDIR) != 0) {
+	if (ne.action != NOTIFY_ACTION_NEW_NAME || (e->mask & IN_ISDIR) != 0) {
 		return;
 	}
 
 	ne.action = NOTIFY_ACTION_MODIFIED;
 	e->mask = IN_ATTRIB;
-	
+
 	for (w=in->watches;w;w=next) {
 		next = w->next;
 		if (w->wd == e->wd && filter_match(w, e) &&
@@ -224,8 +222,7 @@ static void inotify_dispatch(struct inotify_private *in,
 static void inotify_handler(struct event_context *ev, struct fd_event *fde,
 			    uint16_t flags, void *private_data)
 {
-	struct inotify_private *in = talloc_get_type(private_data,
-						     struct inotify_private);
+	struct inotify_private *in = talloc_get_type(private_data, struct inotify_private);
 	int bufsize = 0;
 	struct inotify_event *e0, *e;
 	uint32_t prev_cookie=0;
@@ -235,7 +232,7 @@ static void inotify_handler(struct event_context *ev, struct fd_event *fde,
 	  filenames, and thus can't know how much to allocate
 	  otherwise
 	*/
-	if (ioctl(in->fd, FIONREAD, &bufsize) != 0 || 
+	if (ioctl(in->fd, FIONREAD, &bufsize) != 0 ||
 	    bufsize == 0) {
 		DEBUG(0,("No data on inotify fd?!\n"));
 		return;
@@ -293,7 +290,7 @@ static NTSTATUS inotify_setup(struct sys_notify_context *ctx)
 
 	/* add a event waiting for the inotify fd to be readable */
 	event_add_fd(ctx->ev, in, in->fd, EVENT_FD_READ, inotify_handler, in);
-	
+
 	return NT_STATUS_OK;
 }
 
@@ -344,10 +341,9 @@ static int watch_destructor(struct inotify_watch_context *w)
 	if (w == NULL) {
 		DEBUG(10, ("Deleting inotify watch %d\n", wd));
 		if (inotify_rm_watch(in->fd, wd) == -1) {
-			DEBUG(1, ("inotify_rm_watch returned %s\n",
-				  strerror(errno)));
+			DEBUG(1, ("inotify_rm_watch returned %s\n", strerror(errno)));
 		}
-		
+
 	}
 	return 0;
 }
@@ -359,10 +355,10 @@ static int watch_destructor(struct inotify_watch_context *w)
 */
 NTSTATUS inotify_watch(struct sys_notify_context *ctx,
 		       struct notify_entry *e,
-		       void (*callback)(struct sys_notify_context *ctx, 
+		       void (*callback)(struct sys_notify_context *ctx,
 					void *private_data,
 					struct notify_event *ev),
-		       void *private_data, 
+		       void *private_data,
 		       void *handle_p)
 {
 	struct inotify_private *in;
@@ -428,7 +424,7 @@ NTSTATUS inotify_watch(struct sys_notify_context *ctx,
 
 	/* the caller frees the handle to stop watching */
 	talloc_set_destructor(w, watch_destructor);
-	
+
 	return NT_STATUS_OK;
 }
 
