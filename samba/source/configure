@@ -2026,8 +2026,8 @@ fi
 
 
 
-
-
+# HM3, generate version header.
+./script/mkversion.sh >/dev/null
 
 
 
